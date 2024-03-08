@@ -1,0 +1,15 @@
+// settings.gradle
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+}
+
+// app module's build.gradle
+dependencies { 
+    // Stream Chat Android SDK
+    implementation "io.getstream:stream-chat-android-compose:5.11.0" 
+}

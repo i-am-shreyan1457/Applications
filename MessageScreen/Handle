@@ -1,0 +1,57 @@
+@Composable
+fun WhatsAppMessages(
+  channelId: String,
+  composeNavigator: AppComposeNavigator,
+  whatsAppMessagesViewModel: WhatsAppMessagesViewModel
+) 
+  LaunchedEffect(key1 = channelId) {
+    whatsAppMessagesViewModel.handleEvents(
+      WhatsAppMessageEvent.FetchChannel(channelId)
+    )
+  }
+
+
+@Composable
+fun WhatsAppMessageTopBar(
+  viewModel: WhatsAppMessagesViewModel,
+  composeNavigator: AppComposeNavigator
+) 
+  val messageUiState by viewModel.messageUiSate.collectAsState()
+
+  TopAppBar(
+    modifier = Modifier.fillMaxWidth(),
+    backgroundColor = MaterialTheme.colorScheme.primary,
+    elevation = 0.dp
+  ) {
+    ..
+    
+    WhatsAppMessageUserInfo(messageUiState = messageUiState)
+    
+    ..
+ }
+ 
+@Composable
+private fun WhatsAppMessageUserInfo(
+  messageUiState: WhatsAppMessageUiState
+) {
+  when (messageUiState) {
+    WhatsAppMessageUiState.Loading -> WhatsAppLoadingIndicator()
+    WhatsAppMessageUiState.Error -> Unit
+    is WhatsAppMessageUiState.Success -> {
+      GlideImage(
+        modifier = Modifier
+          .size(32.dp)
+          .clip(CircleShape),
+        imageModel = messageUiState.channel.image,
+        previewPlaceholder = io.getstream.whatsappclone.designsystem.R.drawable.placeholder
+      )
+
+      Text(
+        modifier = Modifier.padding(start = 12.dp),
+        text = messageUiState.channel.name,
+        color = MaterialTheme.colorScheme.tertiary,
+        style = MaterialTheme.typography.bodyLarge
+      )
+    }
+  }
+}  
