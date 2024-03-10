@@ -1,0 +1,58 @@
+private val DarkWhatsAppColorScheme = darkColorScheme(
+  primary = DARK_GREEN200,
+  primaryContainer = DARK_GREEN300,
+  secondary = GREEN500,
+  background = DARK_GREEN300,
+  tertiary = WHITE200,
+  onTertiary = GRAY200
+)
+
+private val LightWhatsAppColorScheme = lightColorScheme(
+  primary = GREEN500,
+  primaryContainer = GREEN700,
+  secondary = GREEN300,
+  background = WHITE200,
+  tertiary = WHITE200,
+  onTertiary = GRAY200
+)
+
+/** Light Android background theme */
+private val LightAndroidBackgroundTheme = BackgroundTheme(color = Color.White)
+
+/** Dark Android background theme */
+private val DarkAndroidBackgroundTheme = BackgroundTheme(color = DARK_GREEN300)
+
+@Composable
+fun WhatsAppCloneComposeTheme(
+  darkTheme: Boolean = isSystemInDarkTheme(),
+  content: @Composable () -> Unit
+) {
+  val colorScheme = if (darkTheme) DarkWhatsAppColorScheme else LightWhatsAppColorScheme
+  val backgroundTheme = if (darkTheme) DarkAndroidBackgroundTheme else LightAndroidBackgroundTheme
+
+  CompositionLocalProvider(
+    LocalBackgroundTheme provides backgroundTheme
+  ) {
+    MaterialTheme(
+      colorScheme = colorScheme,
+      typography = Typography,
+      content = content
+    )
+  }
+}
+
+WhatsAppCloneComposeTheme {
+    ..
+  
+    WhatsAppCloneBackground {
+      WhatsAppNavHost(
+        navHostController = navHostController,
+        composeNavigator = composeNavigator
+      )
+    }
+  }
+
+  TabRow(
+  backgroundColor = MaterialTheme.colorScheme.primary,
+  ...
+)

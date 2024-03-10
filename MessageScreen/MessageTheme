@@ -1,0 +1,52 @@
+ChatTheme {
+  MessagesScreen(
+    channelId = channelId,
+    showHeader = false,
+    onBackPressed = { composeNavigator.navigateUp() }
+  )
+}
+
+@HiltViewModel
+class WhatsAppMessagesViewModel @Inject constructor(
+  @Dispatcher(WhatsAppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
+  private val chatClient: ChatClient
+) : ViewModel() {
+  private val messageMutableUiState =
+    MutableStateFlow<WhatsAppMessageUiState>(WhatsAppMessageUiState.Loading)
+  val messageUiSate: StateFlow<WhatsAppMessageUiState> = messageMutableUiState
+
+  private fun fetchChannel(channelId: String) {
+    viewModelScope.launch(ioDispatcher) {
+      val result = chatClient.channel(channelId).watch().await()
+      result.onSuccess {
+        messageMutableUiState.value = WhatsAppMessageUiState.Success(result.data())
+      }.onError {
+        messageMutableUiState.value = WhatsAppMessageUiState.Error
+      }
+    }
+  }
+}
+
+sealed interface WhatsAppMessageUiState {
+  data class Success(val channel: Channel) : WhatsAppMessageUiState
+  object Loading : WhatsAppMessageUiState
+  object Error : WhatsAppMessageUiState
+}
+
+@HiltViewModel
+class WhatsAppMessagesViewModel @Inject constructor(
+ ..
+) : ViewModel() {
+
+ ..
+ 
+ fun handleEvents(whatsAppMessageEvent: WhatsAppMessageEvent) {
+    when (whatsAppMessageEvent) {
+      is WhatsAppMessageEvent.FetchChannel -> fetchChannel(whatsAppMessageEvent.channelId)
+    }
+  }
+}
+
+sealed interface WhatsAppMessageEvent {
+  class FetchChannel(val channelId: String) : WhatsAppMessageEvent
+}

@@ -1,0 +1,29 @@
+ChatTheme {
+  ChannelsScreen(
+    isShowingHeader = false,
+    onItemClick = { channel ->
+      // navigate to messages screen
+    }
+  )
+}
+
+@HiltViewModel
+class WhatsAppMessagesViewModel @Inject constructor(
+  @Dispatcher(WhatsAppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
+  private val chatClient: ChatClient
+) : ViewModel() {
+  private val messageMutableUiState =
+    MutableStateFlow<WhatsAppMessageUiState>(WhatsAppMessageUiState.Loading)
+  val messageUiSate: StateFlow<WhatsAppMessageUiState> = messageMutableUiState
+
+  private fun fetchChannel(channelId: String) {
+    viewModelScope.launch(ioDispatcher) {
+      val result = chatClient.channel(channelId).watch().await()
+      result.onSuccess {
+        messageMutableUiState.value = WhatsAppMessageUiState.Success(result.data())
+      }.onError {
+        messageMutableUiState.value = WhatsAppMessageUiState.Error
+      }
+    }
+  }
+}

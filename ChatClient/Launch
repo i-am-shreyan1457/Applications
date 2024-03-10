@@ -1,0 +1,9 @@
+<provider
+  android:name="androidx.startup.InitializationProvider"
+  android:authorities="io.getstream.whatsappclone.androidx-startup"
+  android:exported="false"
+  tools:node="merge">
+  <meta-data
+    android:name="io.getstream.whatsappclone.chats.initializer.StreamChatInitializer"
+    android:value="androidx.startup" />
+</provider>
